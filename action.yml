@@ -7,8 +7,11 @@ inputs:
     description: 'The GitHub token used to manage labels'
     required: false
     default: ${{ github.token }}
-  OPENAI_TOKEN:
+  OPENAI_API_KEY:
     description: 'The API token for the OpenAI ChatGPT API.'
+    required: true
+  OPENAI_API_BASE:
+    description: 'The base URL for the OpenAI ChatGPT API.'
     required: true
   ISSUE_NUMBER:
     description: 'The number of the issue to analyze.'
