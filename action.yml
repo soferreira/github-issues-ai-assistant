@@ -1,0 +1,17 @@
+# action.yml
+name: 'GitHub Issues AI Assistant'
+description: 'A GitHub Action to help you manage your issues'
+author: "Saverio Proto"
+inputs:
+  repo-token:
+    description: 'The GitHub token used to manage labels'
+    required: false
+    default: ${{ github.token }}
+  OPENAI_TOKEN:
+    description: 'The API token for the OpenAI ChatGPT API.'
+    required: true
+  ISSUE_NUMBER:
+    description: 'The number of the issue to analyze.'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

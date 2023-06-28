@@ -1,0 +1,16 @@
+name: My Workflow
+on:
+  issues:
+    types: [opened, edited]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+    - uses: actions/checkout@master
+    - name: Run action
+      uses: zioproto/github-issues-ai-assistant@main
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue_number: ${{ github.event.issue.number }}
