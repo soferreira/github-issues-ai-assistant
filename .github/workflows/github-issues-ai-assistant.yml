@@ -3,11 +3,6 @@ permissions: write-all
 on:
   issues:
     types: [opened, edited]
-  workflow_dispatch:
-    inputs:
-      issue_number:
-        description: 'The number of the issue to analyze.'
-        required: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,7 +12,7 @@ jobs:
       uses: zioproto/github-issues-ai-assistant@main
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-#        issue_number: ${{ github.event.issue.number }}
-        issue_number: ${{ inputs.issue_number }}
+        issue_number: ${{ github.event.issue.number }}
+        #issue_number: ${{ inputs.issue_number }}
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
