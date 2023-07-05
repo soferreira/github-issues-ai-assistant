@@ -22,7 +22,7 @@ def main():
     openai.api_version = "2023-05-15"
     issuenumber = os.environ["INPUT_ISSUE_NUMBER"]
     repository = os.environ["GITHUB_REPOSITORY"]
-    
+
     print(f'Processing: Issue {issuenumber} of {repository}')
     print(f'baseurl: {openai.api_base}')
 
