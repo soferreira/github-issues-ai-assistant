@@ -21,12 +21,14 @@ def main():
     openai.api_base = os.environ["INPUT_OPENAI_API_BASE"]
     openai.api_version = "2023-05-15"
     issuenumber = os.environ["INPUT_ISSUE_NUMBER"]
-    print(f'Processing: {issuenumber}')
+    repository = os.environ["GITHUB_REPOSITORY"]
+    
+    print(f'Processing: Issue {issuenumber} of {repository}')
     print(f'baseurl: {openai.api_base}')
 
     auth = Auth.Token(os.environ["INPUT_REPO-TOKEN"])
     g = Github(auth=auth)
-    repo = g.get_repo("zioproto/github-issues-ai-assistant")
+    repo = g.get_repo(repository)
     issue = repo.get_issue(number=int(issuenumber))
     # Create a langchain agent:
 
