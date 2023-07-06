@@ -1,6 +1,7 @@
 import os
 from langchain.chains.router import MultiPromptChain
-from langchain.chains.router.llm_router import LLMRouterChain, RouterOutputParser
+from langchain.chains.router.llm_router import (
+    LLMRouterChain, RouterOutputParser)
 from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from langchain.chains import LLMChain
 from langchain.chat_models import AzureChatOpenAI
@@ -22,7 +23,9 @@ def langchain_router_chain(input_prompt):
     destination_chains = {}
 
     for p_info in prompt_infos:
-        prompt = ChatPromptTemplate.from_template(template=p_info["prompt_template"])
+        prompt = ChatPromptTemplate.from_template(
+            template=p_info["prompt_template"]
+        )
         chain = LLMChain(llm=llm, prompt=prompt)
         destination_chains[p_info["name"]] = chain
 
@@ -32,7 +35,9 @@ def langchain_router_chain(input_prompt):
     default_prompt = ChatPromptTemplate.from_template("{input}")
     default_chain = LLMChain(llm=llm, prompt=default_prompt)
 
-    router_template = MULTI_PROMPT_ROUTER_TEMPLATE.format(destinations=destinations_str)
+    router_template = MULTI_PROMPT_ROUTER_TEMPLATE.format(
+        destinations=destinations_str
+    )
 
     router_prompt = PromptTemplate(
         template=router_template,
