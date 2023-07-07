@@ -40,7 +40,7 @@ MULTI_PROMPT_ROUTER_TEMPLATE = """Given a raw text input to a \
     if you don't think any modifications are needed.
 
     << CANDIDATE PROMPTS >>
-    {destinations}
+    {{destinations}}
 
     << INPUT >>
     {{input}}
