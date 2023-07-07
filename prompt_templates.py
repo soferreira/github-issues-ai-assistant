@@ -1,6 +1,6 @@
 prompt_templates = {
-    "bug": """I will provide you a Github Issue opened in a repository. The issue is reporting a bug. You can analyse its description and check if all the information to reproduce the bug is present. If not, you can ask the reporter to provide more information. Here is the description: {input}""",
-    "feature": """I will provide you a Github Issue opened in a repository. The issue is requesting a new feature. You can analyse the issue description and tell if the feature is in preview or not. Here is the description: {input}""",
+    "bug": """I will provide you a Github Issue opened in a repository. The issue is reporting a bug. You can analyse its description and check if all the information to reproduce the bug is present. If not, you can ask the reporter to provide more information. Here is the description: ```{input}```""",
+    "feature": """I will provide you a Github Issue opened in a repository. The issue is requesting a new feature. You can analyse the issue description and tell if the feature is in preview or not. Here is the description: ```{input}```""",
 }
 
 prompt_infos = [
@@ -27,10 +27,10 @@ MULTI_PROMPT_ROUTER_TEMPLATE = """Given a raw text input to a \
     << FORMATTING >>
     Return a markdown code snippet with a JSON object formatted to look like:
     ```json
-    {
+    {{{{
         "destination": "string - name of the prompt to use or DEFAULT",
         "next_inputs": "string - a potentially modified version of the original input",
-    }
+    }}}}
     ```
 
     REMEMBER: "destination" MUST be one of the candidate prompt \
@@ -40,7 +40,7 @@ MULTI_PROMPT_ROUTER_TEMPLATE = """Given a raw text input to a \
     if you don't think any modifications are needed.
 
     << CANDIDATE PROMPTS >>
-    {{destinations}}
+    {destinations}
 
     << INPUT >>
     {{input}}

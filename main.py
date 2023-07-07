@@ -30,11 +30,12 @@ def langchain_router_chain(input_prompt):
         destination_chains[p_info["name"]] = chain
 
     destinations = [f"{p['name']}: {p['description']}" for p in prompt_infos]
+    print(destinations)
     destinations_str = "\n".join(destinations)
 
     default_prompt = ChatPromptTemplate.from_template("{input}")
     default_chain = LLMChain(llm=llm, prompt=default_prompt)
-
+    print(destinations_str)
     router_template = MULTI_PROMPT_ROUTER_TEMPLATE.format(
         destinations=destinations_str
     )
