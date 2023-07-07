@@ -1,40 +1,77 @@
 import os
+from langchain.chains.router import MultiPromptChain
+from langchain.chains.router.llm_router import (
+    LLMRouterChain, RouterOutputParser)
+from langchain.prompts import PromptTemplate, ChatPromptTemplate
+from langchain.chains import LLMChain
+from langchain.chat_models import AzureChatOpenAI
 from github import Github
 from github import Auth
-import openai
+from prompt_templates import prompt_infos, MULTI_PROMPT_ROUTER_TEMPLATE
 
 
-def get_completion(prompt, model="gpt-35-turbo"):
-    messages = [{"role": "user", "content": prompt}]
-    response = openai.ChatCompletion.create(
-        model=model,
-        engine="gpt-35-turbo",
-        messages=messages,
+def langchain_router_chain(input_prompt):
+    llm = AzureChatOpenAI(
+        openai_api_base=os.environ["INPUT_OPENAI_API_BASE"],
+        openai_api_version="2023-05-15",
+        deployment_name="gpt-35-turbo",
+        openai_api_key=os.environ["INPUT_OPENAI_API_KEY"],
+        openai_api_type="azure",
         temperature=0,
     )
-    return response.choices[0].message["content"]
+
+    destination_chains = {}
+
+    for p_info in prompt_infos:
+        prompt = ChatPromptTemplate.from_template(
+            template=p_info["prompt_template"]
+        )
+        chain = LLMChain(llm=llm, prompt=prompt)
+        destination_chains[p_info["name"]] = chain
+
+    destinations = [f"{p['name']}: {p['description']}" for p in prompt_infos]
+    destinations_str = "\n".join(destinations)
+
+    default_prompt = ChatPromptTemplate.from_template("{input}")
+    default_chain = LLMChain(llm=llm, prompt=default_prompt)
+
+    router_template = MULTI_PROMPT_ROUTER_TEMPLATE.format(
+        destinations=destinations_str
+    )
+
+    router_prompt = PromptTemplate(
+        template=router_template,
+        input_variables=["input"],
+        output_parser=RouterOutputParser(),
+    )
+
+    router_chain = LLMRouterChain.from_llm(llm, router_prompt)
+
+    multi_prompt_chain = MultiPromptChain(
+        router_chain=router_chain,
+        destination_chains=destination_chains,
+        default_chain=default_chain, verbose=True
+    )
+
+    response = multi_prompt_chain.run(input_prompt)
+    print(response)
+
+    return response
 
 
 def main():
-    openai.api_type = "azure"
-    openai.api_key = os.environ["INPUT_OPENAI_API_KEY"]
-    openai.api_base = os.environ["INPUT_OPENAI_API_BASE"]
-    openai.api_version = "2023-05-15"
-    issuenumber = os.environ["INPUT_ISSUE_NUMBER"]
+
+    issue_number = os.environ["INPUT_ISSUE_NUMBER"]
     repository = os.environ["GITHUB_REPOSITORY"]
 
-    print(f'Processing: Issue {issuenumber} of {repository}')
-    print(f'baseurl: {openai.api_base}')
+    print(f'Processing: Issue {issue_number} of {repository}')
 
     auth = Auth.Token(os.environ["INPUT_REPO-TOKEN"])
-    g = Github(auth=auth)
-    repo = g.get_repo(repository)
-    issue = repo.get_issue(number=int(issuenumber))
-    # Create a langchain agent:
+    github = Github(auth=auth)
+    repo = github.get_repo(repository)
+    issue = repo.get_issue(number=int(issue_number))
 
-    prompt = f"""Make a short summary of the following GitHub issue:\
-          ```{issue.body}```"""
-    response = get_completion(prompt)
+    response = langchain_router_chain(issue.body)
     issue.create_comment(response)
 
 
