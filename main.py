@@ -1,13 +1,16 @@
 import os
+import sys
 from langchain.chains.router import MultiPromptChain
 from langchain.chains.router.llm_router import (
     LLMRouterChain, RouterOutputParser)
 from langchain.prompts import PromptTemplate, ChatPromptTemplate
 from langchain.chains import LLMChain
 from langchain.chat_models import AzureChatOpenAI
-from github import Github
-from github import Auth
+from dotenv import load_dotenv
+from github import Github, Auth
+
 from prompt_templates import prompt_infos, MULTI_PROMPT_ROUTER_TEMPLATE
+from issue_examples import DEFAULT_ISSUE_BODY
 
 
 def langchain_router_chain(input_prompt):
@@ -60,7 +63,7 @@ def langchain_router_chain(input_prompt):
     return response
 
 
-def main():
+def run_github_action():
 
     issue_number = os.environ["INPUT_ISSUE_NUMBER"]
     repository = os.environ["GITHUB_REPOSITORY"]
@@ -76,5 +79,19 @@ def main():
     issue.create_comment(response)
 
 
+def run_locally():
+
+    # Load the .env file
+    load_dotenv()
+
+    # Run the chain locally with default issue body
+    response = langchain_router_chain(DEFAULT_ISSUE_BODY)
+    print(response)
+
+
 if __name__ == "__main__":
-    main()
+
+    if len(sys.argv) > 2 and sys.argv[1] == "github_action":
+        run_github_action()
+    else:
+        run_locally()
