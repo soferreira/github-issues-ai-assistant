@@ -2,7 +2,7 @@ DEFAULT_ISSUE_BODY = """
 
 ## Is there an existing issue for this?
 
- I have searched the existing issues
+I have searched the existing issues
 
 ## Description
 
