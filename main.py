@@ -93,7 +93,7 @@ def run_locally():
 
 if __name__ == "__main__":
 
-    if len(sys.argv) > 2 and sys.argv[1] == "github_action":
-        run_github_action()
-    else:
+    if len(sys.argv) > 2 and sys.argv[1] == "local":
         run_locally()
+    else:
+        run_github_action()

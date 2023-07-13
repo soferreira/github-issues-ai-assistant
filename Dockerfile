@@ -5,4 +5,4 @@ WORKDIR /app
 RUN pip install langchain openai PyGithub cffi cryptography python-dotenv
 
 ENV PYTHONPATH /app
-CMD ["python3", "/app/main.py", "github_action"]
+CMD ["python3", "/app/main.py"]
