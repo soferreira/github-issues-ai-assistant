@@ -58,7 +58,7 @@ def langchain_router_chain(input_prompt):
     )
 
     print(f"INPUT PROMPT: \n\n{input_prompt}\n\n")
-    input_prompt = input_prompt.replace("```", "")
+    input_prompt = input_prompt.replace("```", "")  # temporary fix
     response = multi_prompt_chain.run(input_prompt)
     print(response)
 
