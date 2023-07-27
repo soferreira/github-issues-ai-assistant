@@ -25,6 +25,7 @@ def langchain_router_chain(input_prompt):
 
     destination_chains = {}
 
+    # Create a list that holds the destination chains
     for p_info in prompt_infos:
         prompt = ChatPromptTemplate.from_template(
             template=p_info["prompt_template"]
@@ -32,13 +33,19 @@ def langchain_router_chain(input_prompt):
         chain = LLMChain(llm=llm, prompt=prompt)
         destination_chains[p_info["name"]] = chain
 
+    # Create a list of destination names and descriptions
     destinations = [f"{p['name']}: {p['description']}" for p in prompt_infos]
-    print(destinations)
+    print(f'{destinations = }')
+
+    # Create a string with the destination names and descriptions all together
+    # in a single string separated by newlines
     destinations_str = "\n".join(destinations)
 
-    default_prompt = ChatPromptTemplate.from_template("{input}")
+    # Create a prompt that is a just a empty string with the {input} placeholder
+    default_prompt = ChatPromptTemplate.from_template("Make a summary of this issue:\n {input}")
+
     default_chain = LLMChain(llm=llm, prompt=default_prompt)
-    print(destinations_str)
+
     router_template = MULTI_PROMPT_ROUTER_TEMPLATE.format(
         destinations=destinations_str
     )
@@ -54,13 +61,14 @@ def langchain_router_chain(input_prompt):
     multi_prompt_chain = MultiPromptChain(
         router_chain=router_chain,
         destination_chains=destination_chains,
-        default_chain=default_chain, verbose=True
+        default_chain=default_chain,
+        verbose=True,
     )
 
-    print(f"INPUT PROMPT: \n\n{input_prompt}\n\n")
-    input_prompt = input_prompt.replace("```", "")  # temporary fix
+    #print(f'{input_prompt = }')
+    input_prompt = input_prompt.replace("```", "")  # temporary fix, remove backticks that confuse the model
     response = multi_prompt_chain.run(input_prompt)
-    print(response)
+    print(f'{response = }')
 
     return response
 

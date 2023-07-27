@@ -1,5 +1,7 @@
 DEFAULT_ISSUE_BODY = """
 
+Title: Support for AKS API Server VNet Integration
+
 ## Is there an existing issue for this?
 
 I have searched the existing issues
