@@ -24,13 +24,19 @@ bingurl = "https://api.bing.microsoft.com/v7.0/search"
 def runagent(issue_body):
     simpleprompt = PromptTemplate.from_template(
         """
-        I will provide you a Github Issue opened in a repository of Terraform modules for Azure. You have to write a comment on the issue. The comment should be one of the following:
-        1. If the issue is reporting a bug, you can analyse its description and check if all the information to reproduce the bug is present. If not, you can ask the reporter to provide more information.
-        2. If the issue is requesting a new feature for the Terraform module, you can analyse the issue description and tell if the corresponding Azure feature is in preview or not.
+        I will provide you a Github Issue opened in a repository of Terraform modules for Azure. Write a comment for the issue. The comment should be one of the following:
+        1. If the issue is reporting a bug, you can analyse its description and check if all the information to reproduce the bug is present. If not, ask the reporter to provide the missing information.
+        2. If the issue is requesting a new feature for the Terraform module, check if the corresponding Azure feature is in preview or not.
 
         Here is the description: ```{issue_body}```
 
-        Your output must be only the GitHub comment as it will appear on GitHub. Sign your comment with the name GitHub AI Issue Assistant.
+        Output only the GitHub comment verbatim. Sign yourself as "GitHub AI Issue Assistant".
+
+        Example reply:
+        Hello, thanks for opening this issue. I have searched on bing and I found that the feature
+        you are requesting is still in preview. As soon as the feature is promoted to GA we will act on it.
+        Thank you for your patience.
+        GitHub AI Issue Assistant
         """
     )
 
