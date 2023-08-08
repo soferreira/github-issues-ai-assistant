@@ -40,7 +40,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 
 No response
 
-"""
+"""  # noqa: E501
 
 DEFAULT_BUG_BODY = """
 
@@ -246,4 +246,4 @@ _No response_
 ### References
 
 _No response_
-"""
+"""  # noqa: E501

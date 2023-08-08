@@ -1,14 +1,9 @@
 import os
 import sys
-from langchain.chains.router import MultiPromptChain
-from langchain.chains.router.llm_router import LLMRouterChain, RouterOutputParser
-from langchain.prompts import PromptTemplate, ChatPromptTemplate
-from langchain.chains import LLMChain
-from langchain.chat_models import AzureChatOpenAI
+from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
 from github import Github, Auth
 
-from langchain.llms.openai import AzureOpenAI
 from langchain.chat_models import AzureChatOpenAI
 from langchain.agents import load_tools, initialize_agent, AgentType
 
@@ -37,7 +32,7 @@ def runagent(issue_body):
         you are requesting is still in preview. As soon as the feature is promoted to GA we will act on it.
         Thank you for your patience.
         GitHub AI Issue Assistant
-        """
+        """  # noqa: E501
     )
 
     llm = AzureChatOpenAI(
@@ -52,14 +47,17 @@ def runagent(issue_body):
     bing_key = os.environ["INPUT_BING_SUBSCRIPTION_KEY"]
 
     tools = load_tools(
-        ["bing-search"], llm, bing_subscription_key=bing_key, bing_search_url=bingurl
+        ["bing-search"],
+        llm,
+        bing_subscription_key=bing_key,
+        bing_search_url=bingurl
     )
 
     agent = initialize_agent(
         tools, llm, agent=AgentType.OPENAI_FUNCTIONS, verbose=False
     )
-
-    # issue_body = issue_body.replace("```", "")  # temporary fix, remove backticks that confuse the model
+    # temporary fix, remove backticks that confuse the model
+    # issue_body = issue_body.replace("```", "")
 
     result = agent.run(simpleprompt.format(issue_body=issue_body))
     return result
