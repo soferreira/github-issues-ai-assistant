@@ -17,3 +17,4 @@ jobs:
         #issue_number: ${{ inputs.issue_number }}
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         OPENAI_API_BASE: ${{ secrets.OPENAI_API_BASE }}
+        BING_SUBSCRIPTION_KEY: ${{ secrets.BING_SUBSCRIPTION_KEY }}
