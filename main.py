@@ -91,9 +91,9 @@ def run_github_action():
     
     issues = repo.get_issues(state="all", sort="created", direction="desc")
     for i in issues:
-        print(i.body)
+        print(i.number, i.body, i.title)
     
-    issue.create_comment(response + "\n" + issues)
+    issue.create_comment(response)
 
 
 def run_locally():
