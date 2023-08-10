@@ -89,7 +89,7 @@ def run_github_action():
 
     response = run_agent(issue.body)
     
-    issues = repo.get_issues(state="all", sort="created", direction="desc", limit=10)
+    issues = repo.get_issues(state="all", sort="created", direction="desc")
     for i in issues:
         print(i.body)
     
