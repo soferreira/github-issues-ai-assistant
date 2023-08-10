@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Run action
-      uses: zioproto/github-issues-ai-assistant@main
+      uses: soferreira/github-issues-ai-assistant@main
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         issue_number: ${{ github.event.issue.number }}
