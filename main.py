@@ -16,7 +16,7 @@ from issue_examples import DEFAULT_ISSUE_BODY, DEFAULT_BUG_BODY
 bing_url = "https://api.bing.microsoft.com/v7.0/search"
 
 
-def run_agent(issue_body):
+def run_agent(issue_body, repo_issues):
     
     simple_prompt = PromptTemplate.from_template(
     """
@@ -43,7 +43,10 @@ def run_agent(issue_body):
     GitHub AI Issue Assistant"
 
     Here is the Github Issue description: 
-    ```{issue_body}```    
+    ```{issue_body}```
+
+    If there are any similar issue from the issue list bellow that might be related with the issue, add them to your response at the end of the comment before signing off.
+    ```{repo_issues}```
 
     """  # noqa: E501
     )
@@ -72,7 +75,7 @@ def run_agent(issue_body):
     # temporary fix, remove backticks that confuse the model
     # issue_body = issue_body.replace("```", "")
 
-    result = agent.run(simple_prompt.format(issue_body=issue_body))
+    result = agent.run(simple_prompt.format(issue_body=issue_body, repo_issues=repo_issues))
     return result
 
 
@@ -86,12 +89,10 @@ def run_github_action():
     github = Github(auth=auth)
     repo = github.get_repo(repository)
     issue = repo.get_issue(number=int(issue_number))
+    repo_issues = repo.get_issues(state="all", sort="created", direction="desc")
+    repo_issues = [f"- {i.number} - {i.title}" for i in repo_issues if i.number != issue.number]
 
-    response = run_agent(issue.body)
-    
-    issues = repo.get_issues(state="all", sort="created", direction="desc")
-    for i in issues:
-        print(i.number, i.body, i.title)
+    response = run_agent(issue.body, repo_issues)
     
     issue.create_comment(response)
 
@@ -109,16 +110,6 @@ def run_locally():
     print("Running locally with default bug body")
     response = run_agent(DEFAULT_BUG_BODY)
     print(response)
-
-
-def download_last_n_issues(n=10):
-    """Download the last n issues from the repo"""
-    auth = Auth.Token(os.environ["INPUT_REPO-TOKEN"])
-    github = Github(auth=auth)
-    repo = github.get_repo(os.environ["GITHUB_REPOSITORY"])
-    issues = repo.get_issues(state="all", sort="created", direction="desc", limit=n)
-    for issue in issues:
-        print(issue.body)
 
 
 if __name__ == "__main__":
