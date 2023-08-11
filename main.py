@@ -6,25 +6,25 @@ from github import Github, Auth
 
 from langchain.chat_models import AzureChatOpenAI
 from langchain.agents import load_tools, initialize_agent, AgentType
+from issue_examples import DEFAULT_ISSUE_BODY, DEFAULT_BUG_BODY
 
 # Uncomment to debug:
 import langchain
 langchain.debug = True
 
-from issue_examples import DEFAULT_ISSUE_BODY, DEFAULT_BUG_BODY
 
-bing_url = "https://api.bing.microsoft.com/v7.0/search"
+BING_URL = "https://api.bing.microsoft.com/v7.0/search"
 
 
-def run_agent(issue_body, repo_issues):
-    
+def run_agent(issue_body, repo_issues=None):
+
     simple_prompt = PromptTemplate.from_template(
     """
-    In this task, you will be provided with a description of a Github Issue that was opened in a repository of Terraform modules for Azure services. 
-    Based on the provided description, you're asked to create a specific comment in response to the issue. 
+    In this task, you will be provided with a description of a Github Issue that was opened in a repository of Terraform modules for Azure services.
+    Based on the provided description, you're asked to create a specific comment in response to the issue.
     There are two scenarios:
-    - If the issue is a bug report, your task is to thoroughly analyze the description. 
-      Check if it contains all the necessary information such as the steps to reproduce the bug, the expected and actual results, and the environment in which the bug occurred. 
+    - If the issue is a bug report, your task is to thoroughly analyze the description.
+      Check if it contains all the necessary information such as the steps to reproduce the bug, the expected and actual results, and the environment in which the bug occurred.
       If all these details are already present, you should proceed to acknowledge the bug report and possibly provide initial troubleshooting steps or confirm that the issue is being looked into.
       However, if any of these crucial details are missing from the description, you need to politely request the reporter to provide the missing information to help in the bug investigation process.
     - If the issue is a feature request for the Terraform module, you need to check whether the corresponding feature in Azure is still in the preview phase or not.
@@ -34,18 +34,24 @@ def run_agent(issue_body, repo_issues):
     For instance, if the issue is about a feature request that is still in private preview in Azure, your comment might look something like this:
 
     "Hello, 
-    
+
     Thanks for opening this issue. 
-    
-    I have searched on bing and found that the feature you are requesting is still in private preview. As soon as the feature is promoted to GA we will act on it. 
+
+    I have searched on bing and found that the feature you are requesting is still in private preview. As soon as the feature is promoted to GA we will act on it.
     Thank you for your patience. 
-    
+
     GitHub AI Issue Assistant"
 
     Here is the Github Issue description: 
     ```{issue_body}```
 
-    If there are any similar issue from the issue list bellow that might be related with the issue, add them to your response at the end of the comment before signing off.
+    To provide related issues, please include them at the end of your comment before signing off. Only include related issues and avoid adding any unrelated ones.
+    For each related issue, please provide the issue number and name and link it to the issue on GitHub using the following format:
+    [0001 - Support for AKS API Server VNet Integration](https://github.com/OWNER/REPOSITORY/issues/ISSUE_NUMBER)
+
+    OWNER/REPOSITORY is {repository} and ISSUE_NUMBER is {issue_number}
+
+    List of possible related issues:
     ```{repo_issues}```
 
     """  # noqa: E501
@@ -66,7 +72,7 @@ def run_agent(issue_body, repo_issues):
         ["bing-search"],
         llm,
         bing_subscription_key=bing_key,
-        bing_search_url=bing_url
+        bing_search_url=BING_URL
     )
 
     agent = initialize_agent(
@@ -75,7 +81,7 @@ def run_agent(issue_body, repo_issues):
     # temporary fix, remove backticks that confuse the model
     # issue_body = issue_body.replace("```", "")
 
-    result = agent.run(simple_prompt.format(issue_body=issue_body, repo_issues=repo_issues))
+    result = agent.run(simple_prompt.format(issue_body=issue_body, repo_issues=repo_issues, repository=os.environ["GITHUB_REPOSITORY"], issue_number=os.environ["INPUT_ISSUE_NUMBER"]))
     return result
 
 
@@ -93,7 +99,7 @@ def run_github_action():
     repo_issues = [f"- {i.number} - {i.title}" for i in repo_issues if i.number != issue.number]
 
     response = run_agent(issue.body, repo_issues)
-    
+
     issue.create_comment(response)
 
 
