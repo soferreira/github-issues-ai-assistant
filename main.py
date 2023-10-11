@@ -27,7 +27,7 @@ def run_agent(issue_body, repo_issues=None):
       Check if it contains all the necessary information such as the steps to reproduce the bug, the expected and actual results, and the environment in which the bug occurred.
       If all these details are already present, you should proceed to acknowledge the bug report and possibly provide initial troubleshooting steps or confirm that the issue is being looked into.
       However, if any of these crucial details are missing from the description, you need to politely request the reporter to provide the missing information to help in the bug investigation process.
-    - If the issue is a feature request for the Terraform module, you need to check whether the corresponding feature in Azure is still in the preview phase or not.
+    - If the issue is a feature request, you need to check whether the corresponding feature in Azure is still in the preview phase or not.
 
     You should then write your response as a GitHub comment. The response should be the exact comment you would post on GitHub, signed off as "GitHub AI Issue Assistant".
 
@@ -45,7 +45,8 @@ def run_agent(issue_body, repo_issues=None):
     Here is the Github Issue description: 
     ```{issue_body}```
 
-    To provide related issues, please include them at the end of your comment before signing off. Only include related issues and avoid adding any unrelated ones.
+    To provide related issues, please include them at the end of your comment before signing off. Only include related issues and avoid adding any unrelated ones. 
+    A related issue should be one that is similar to the current by referring to the same Azure service or feature. If you are not sure, you can skip this step.
     For each related issue, please provide the issue number and name and link it to the issue on GitHub using the following format:
     [0001 - Support for AKS API Server VNet Integration](https://github.com/OWNER/REPOSITORY/issues/ISSUE_NUMBER)
 
